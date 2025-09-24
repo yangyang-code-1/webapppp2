@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello SampleController!{% endblock %}
+
+{% block body %}
+<div class="navbar bg-base-100 shadow-sm flex justify-between items-center">
+  <div class="flex-1">
+    <a class="btn btn-ghost">
+  <img src="/Primary Logo.png" alt="Logo" style="height:40px;">
+</a>
+  </div>
+  <div class="flex-none items-center" style="gap: 1.5rem;">
+    <input
+      type="text"
+      placeholder="Search"
+      class="input-search"
+    />
+    <div class="dropdown dropdown-end" style="position:relative;">
+      <div id="avatar-btn" tabindex="0" role="button" class="btn btn-ghost btn-circle avatar" onclick="toggleDropdown()">
+        <img src="/PROFILE.png" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+      </div>
+      <ul id="avatar-dropdown" style="display:none;position:absolute;right:0;top:48px;" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+        <li>
+          <a class="justify-between">Account</a>
+        </li>
+        <li><a>Settings</a></li>
+        <li><a>Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+  function toggleDropdown() {
+    var dropdown = document.getElementById('avatar-dropdown');
+    dropdown.style.display = dropdown.style.display === 'none' || dropdown.style.display === '' ? 'block' : 'none';
+  }
+  // Optional: Hide dropdown when clicking outside
+  document.addEventListener('click', function(event) {
+    var avatarBtn = document.getElementById('avatar-btn');
+    var dropdown = document.getElementById('avatar-dropdown');
+    if (!avatarBtn.contains(event.target) && !dropdown.contains(event.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+</script>
+
+<section class="container mx-auto px-4 py-6">
+  <header class="artist-header" style="background: rgb(218, 192, 245);border-radius:12px;padding:2rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:2rem;">
+    <img src="/PROFILE.png" alt="Artist Avatar" class="artist-avatar" style="width:120px;height:120px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+    <form style="flex:1;">
+      <h2 class="text-2xl font-bold mb-2">Artist Name</h2>
+      <p class="mb-2">Digital artist specializing in character commissions. Open for new projects!</p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <div>
+          <span style="font-weight:600;">Location:</span>
+          <span>Example City</span>
+        </div>
+        <div>
+          <span style="font-weight:600;">Experience:</span>
+          <span>5+ years</span>
+        </div>
+        <div>
+          <span style="font-weight:600;">Contact:</span>
+          <span>artist@email.com</span>
+        </div>
+      </div>
+    </form>
+  </header>
+        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem;">
+        <button id="show-commissions" class="btn-tab active">Commission Offers</button>
+        <button id="show-portfolio" class="btn-tab">Portfolio</button>
+      </div>
+      <div id="commissions-section">
+        <div class="product-grid">
+          <div class="product-card">
+            <img src="/FINAL.png" alt="FINAL" class="product-image" style="cursor:pointer;" onclick="showProductModal(this.src, 'Full Body', 'From $50', 'Full Body')" />
+            <div class="product-title">Full Body</div>
+            <div class="product-price">From $50</div>
+            <div class="product-description">Full Body</div>
+          </div>
+          <div class="product-card">
+            <img src="/FINAL.png" alt="FINAL" class="product-image" style="cursor:pointer;" onclick="showProductModal(this.src, 'Commissions', 'From $50', 'Full Body')" />
+            <div class="product-title">Commissions</div>
+            <div class="product-price">From $50</div>
+            <div class="product-description">Full Body</div>
+          </div>
+          <div class="product-card">
+            <img src="/FINAL.png" alt="FINAL" class="product-image" style="cursor:pointer;" onclick="showProductModal(this.src, 'Commissions', 'From $50', 'Full Body')" />
+            <div class="product-title">Commissions</div>
+            <div class="product-price">From $50</div>
+            <div class="product-description">Full Body</div>
+          </div>
+          <!-- Add more product-card divs for other offers -->
+        </div>
+      </div>
+      <div id="portfolio-section" style="display:none;">
+        <div class="portfolio-grid">
+          <!-- ...your portfolio cards here... -->
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+            <img src="/4.png" alt="Portfolio 1" class="portfolio-image" style="cursor:pointer;" onclick="showProductModal(this.src)" />
+            <div class="portfolio-title">Artwork Title</div>
+            <button class="btn btn-like" onclick="alert('Liked!')">
+              <span>&#x1F44D;</span> 
+            </button>
+        </div>
+      </div>
+        </div>
+      </div>
+        <script>
+          const commissionsBtn = document.getElementById('show-commissions');
+          const portfolioBtn = document.getElementById('show-portfolio');
+          commissionsBtn.onclick = function() {
+            document.getElementById('commissions-section').style.display = '';
+            document.getElementById('portfolio-section').style.display = 'none';
+            commissionsBtn.classList.add('active');
+            portfolioBtn.classList.remove('active');
+          };
+          portfolioBtn.onclick = function() {
+            document.getElementById('commissions-section').style.display = 'none';
+            document.getElementById('portfolio-section').style.display = '';
+            portfolioBtn.classList.add('active');
+            commissionsBtn.classList.remove('active');
+          };
+        </script>
+        <script>
+            function showProductModal(src, title = '', price = '', desc = '') {
+              var modal = document.getElementById('product-modal');
+              var modalImg = document.getElementById('product-modal-img');
+              var modalTitle = document.getElementById('product-modal-title');
+              var modalPrice = document.getElementById('product-modal-price');
+              var modalDesc = document.getElementById('product-modal-desc');
+              modal.style.display = 'flex';
+              modalImg.src = src;
+              if (modalTitle) modalTitle.textContent = title;
+              if (modalPrice) modalPrice.textContent = price;
+              if (modalDesc) modalDesc.textContent = desc;
+            }
+            function closeProductModal() {
+              document.getElementById('product-modal').style.display = 'none';
+            }
+        </script>
+  </div>
+  <!-- Product Image Modal -->
+      <div id="product-modal">
+          <div class="modal-content modal-flex">
+            <span class="close" onclick="closeProductModal()">&times;</span>
+            <div style="display:flex;flex-direction:row;align-items:center;gap:2rem;">
+              <img id="product-modal-img" src="" alt="Product" style="max-width:300px;max-height:60vh;border-radius:8px;"/>
+              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:200px;">
+                <div id="product-modal-title" class="product-title" style="margin-bottom:1rem;"></div>
+                <div id="product-modal-price" class="product-price" style="margin-bottom:1rem;"></div>
+                <div id="product-modal-desc" class="product-description"></div>
+              </div>
+            </div>
+          </div>
+      </div>
+
+  </section>
+{% endblock %}
+

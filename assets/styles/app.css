@@ -1,3 +1,288 @@
 body {
-    background-color: skyblue;
+    background-color: rgb(218, 192, 245);
+}
+
+.navbar {
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #fff;
+}
+
+.navbar .flex-1 {
+    align-items: center;
+    display:flex;
+}
+
+.navbar .flex-none {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}                                           
+
+.input-search {
+    background: #fff;
+    border: 2px solid #923fc2;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    color: #333;
+    transition: border-color 0.2s;
+    box-shadow: 0 2px 8px rgba(176, 75, 198, 0.08);
+    margin-bottom: 0;
+}
+.input-search:focus {
+    border-color: #8b5cf6;
+    outline: none;
+}
+
+.artist-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.btn-primary {
+    background-color: #8b5cf6;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-primary:hover {
+    background-color: #7c3aed;
+}
+.btn-secondary {
+    background-color: #b04bc6;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-secondary:hover {
+    background-color: #d07dff;
+}
+    .btn-tab {
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #8b5cf6;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        margin-bottom: -3px;
+        cursor: pointer;
+        transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-tab.active {
+        border-bottom: 3px solid #8b5cf6;
+        color: #b04bc6;
+    }
+
+    /* Avatar Dropdown Styles */
+    #avatar-dropdown {
+        min-width: 180px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+        padding: 0.75rem 0.5rem;
+        position: absolute;
+        right: 0;
+        top: 48px;
+        z-index: 1001;
+        display: none;
+        list-style: none;
+    }
+    #avatar-dropdown li {
+        margin-bottom: 0.5rem;
+    }
+    #avatar-dropdown li:last-child {
+        margin-bottom: 0;
+    }
+    #avatar-dropdown a {
+        color: #6b21a8;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        display: block;
+        transition: background 0.2s, color 0.2s;
+    }
+    #avatar-dropdown a:hover {
+        background: #f3e8ff;
+        color: #8b5cf6;
+    }
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+
+.product-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+.product-image {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.product-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+/* Product Image Modal Styles */
+#product-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    align-items: center;
+    justify-content: center;
+}
+#product-modal.active {
+    display: flex;
+}
+#product-modal .modal-content {
+    position: relative;
+    background: #fff;
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+}
+#product-modal .close {
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    font-size: 2rem;
+    cursor: pointer;
+}
+#product-modal-img {
+    width: 300px;
+    max-width: 100%;
+    max-height: 60vh;
+    border-radius: 8px;
+}
+
+.artist-profile {
+    margin-top: 2rem;
+}
+
+.product-price {
+    color: #2d8f2d;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.product-description {
+    font-size: 0.95rem;
+    color: #555;
+    text-align: center;
+}
+
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; 
+  height: 100%;
+  overflow: auto;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+}
+.modal-content.modal-flex {
+    width: 1800px;
+    height: 720px;
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.portfolio-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 180px;
+}
+
+.portfolio-image {
+    width: 100%;
+    max-width: 180px;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.portfolio-title {
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
 }
