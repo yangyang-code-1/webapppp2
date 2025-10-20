@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commission{% endblock %}
+
+{% block body %}
+<style>
+body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: rgba(255, 255, 255, 1)
+    }
+
+    .commission-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    h1 {
+        padding: 40px 0;
+        margin: 40px 0;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 95%;
+        border-collapse: collapse;
+        background-color: #fff;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-left: 30px;
+    }
+
+    th, td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+    th {
+        background-color: #370d46ff;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover {
+        background-color: #f3f4f6;
+    }
+
+    .actions a {
+        text-decoration: none;
+        color: #370d46ff;
+        font-weight: 500;
+        margin-right: 8px;
+        transition: color 0.2s;
+    }
+
+    .actions a:hover {
+        color: #370d46ff;
+    }
+
+    .btn-new {
+        display: inline-block;
+        margin-top: 20px;
+        background-color: #370d46ff;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 9999px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s;
+        margin-left: 30px;
+    }
+
+    .btn-new:hover {
+        background-color: #370d46ff;
+    }
+    .btn-show, .btn-edit {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background-color 0.3s;
+    margin-right: 6px;
+}
+
+.btn-show {
+    background-color: #10b981; /* Emerald green */
+    color: #fff;
+}
+
+.btn-show:hover {
+    background-color: #059669;
+}
+
+.btn-edit {
+    background-color: #7c2abaff; /* Blue */
+    color: #fff;
+}
+
+.btn-edit:hover {
+    background-color: #7c2abaff;
+}
+</style>
+
+    <h1>Commissions</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Category</th>  {# New: Added category header #}
+                <th>Description</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commission in commissions %}
+            <tr>
+                <td>{{ commission.id }}</td>
+                <td>{{ commission.title }}</td>
+                <td>{{ commission.category ?: 'Uncategorized' }}</td>  {# New: Added category cell; fallback if null #}
+                <td>{{ commission.description }}</td>
+                <td>PHP{{ commission.price }}</td>  {# Minor: Added currency for clarity #}
+                <td>{{ commission.status }}</td>
+                <td>{{ commission.createdAt ? commission.createdAt|date('Y-m-d H:i') : '' }}</td>  {# Minor: Shortened date format #}
+                <td>{{ commission.updatedAt ? commission.updatedAt|date('Y-m-d H:i') : '' }}</td>  {# Minor: Shortened date format #}
+                <td>
+                    <a href="{{ path('app_commission_show', {'id': commission.id}) }}" class="btn-show">SHOW</a>
+                    <a href="{{ path('app_commission_edit', {'id': commission.id}) }}" class="btn-edit">EDIT</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>  {# Updated: From 8 to 9 columns #}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_commission_new') }}" class="btn-new">Create New</a>
+{% endblock %}

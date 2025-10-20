@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Commission{% endblock %}
+
+{% block body %}
+<style>
+body {
+  flex: 1;
+  padding-top: 40px; /* Adjust based on navbar height; prevents overlap on all pages */
+  background-color: #f9f5ff; /* Light purple to match your index page; overrides body's rgb(200,162,200) for consistency */
+}
+/* ====== COMMISSION FORM (ADMIN DASHBOARD) ====== */
+.commission-container {
+  padding: 40px;
+  max-width: 950px;
+  margin: 3rem auto;
+  font-family: 'Poppins', sans-serif;
+}
+
+.commission-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  overflow: hidden;
+  border: none;
+  background: #fff;
+}
+
+.commission-card-header {
+  background: linear-gradient(135deg, #370d46ff, #8b5cf6);
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.commission-card-body {
+  padding: 2.5rem;
+}
+
+/* Grid Layout for Large Screens */
+@media (min-width: 768px) {
+  .commission-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.commission-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.commission-form label {
+  font-weight: 600;
+  color: #370d46ff;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.commission-form input,
+.commission-form textarea,
+.commission-form select {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.commission-form input:focus,
+.commission-form textarea:focus,
+.commission-form select:focus {
+  outline: none;
+  border-color: #370d46ff;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+}
+
+/* Buttons */
+.commission-form button,
+.commission-form a.btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.commission-form .btn-success {
+  background: #370d46ff;
+  color: white;
+  border: none;
+}
+
+.commission-form .btn-success:hover {
+  background: #370d46ff;
+  transform: scale(1.03);
+}
+
+.commission-form .btn-outline-secondary {
+  border: 2px solid #370d46ff;
+  color: #370d46ff;
+  background: white;
+}
+
+.commission-form .btn-outline-secondary:hover {
+  background: #370d46ff;
+  color: white;
+  transform: scale(1.03);
+}
+
+/* Flash Messages */
+.flash-message {
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.flash-success {
+  background-color: #e9fbe9;
+  color: #1e7e34;
+  border-left: 5px solid #28a745;
+}
+
+.flash-error {
+  background-color: #fce8e8;
+  color: #842029;
+  border-left: 5px solid #dc3545;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.commission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+</style>
+
+<div class="commission-container">
+  <div class="commission-card">
+    <div class="commission-card-header">Create New Commission</div>
+    <div class="commission-card-body">
+
+      {# Flash Messages #}
+      {% for message in app.flashes('success') %}
+        <div class="flash-message flash-success">{{ message }}</div>
+      {% endfor %}
+      {% for message in app.flashes('error') %}
+        <div class="flash-message flash-error">{{ message }}</div>
+      {% endfor %}
+
+      {# Commission Form #}
+      {{ form_start(form, {'attr': {'class': 'commission-form'}}) }}
+        <div class="commission-grid">
+
+          <div class="form-group">
+            {{ form_label(form.title, 'Commission Title') }}
+            {{ form_widget(form.title) }}
+            {{ form_errors(form.title) }}
+          </div>
+
+          <div class="form-group">
+            {{ form_label(form.price, 'Price') }}
+            {{ form_widget(form.price) }}
+            {{ form_errors(form.price) }}
+          </div>
+
+          <div class="form-group">
+            {{ form_label(form.category, 'Category') }}
+            {{ form_widget(form.category) }}
+            {{ form_errors(form.category) }}
+          </div>
+
+          <div class="form-group" style="grid-column: span 2;">
+            {{ form_label(form.description, 'Description') }}
+            {{ form_widget(form.description, {'attr': {'rows': '4'}}) }}
+            {{ form_errors(form.description) }}
+          </div>
+
+          {% if form.status is defined %}
+          <div class="form-group">
+            {{ form_label(form.status, 'Status') }}
+            {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.status) }}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-success">Submit Commission</button>
+          <a href="{{ path('app_commission_index') }}" class="btn btn-outline-secondary ms-2">Back to List</a>
+        </div>
+      {{ form_end(form) }}
+    </div>
+  </div>
+</div>
+{% endblock %}

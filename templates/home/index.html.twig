@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome to Comms{% endblock %}
+
+{% block body %}
+<style>
+  /* ====== HOMEPAGE STYLES (refined curved hero version) ====== */
+  body {
+    background: #f9f5ff;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 8rem 2rem 5rem; /* extra top padding for transparent navbar */
+    background: linear-gradient(135deg, #ebd3feff, #c084fc);
+    color: white;
+    border-radius: 0 0 50px 50px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* add a subtle highlight effect */
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.2), transparent 60%);
+    z-index: 0;
+  }
+
+  .hero h1 {
+    position: relative;
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+    z-index: 1;
+  }
+
+  .hero h1 span {
+    color: #f3e8ff;
+  }
+
+  .hero p {
+    position: relative;
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    opacity: 0.95;
+    line-height: 1.6;
+    z-index: 1;
+  }
+
+  .hero .btn-primary {
+    position: relative;
+    background-color: white;
+    color: #7c3aed;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 0.9rem 2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255,255,255,0.3);
+    text-decoration: none;
+    z-index: 1;
+  }
+
+  .hero .btn-primary:hover {
+    background-color: #f3e8ff;
+    transform: translateY(-3px);
+  }
+
+  /* ====== FEATURES SECTION ====== */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 5rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .feature-card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  }
+    .feature-card img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+    /* New: Ensure SVGs render sharply as vectors */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    justify-self: center;
+  }
+
+  /* Specific override for the woman artist icon (slightly larger for better visibility) */
+  .feature-card:first-child img {
+    width: 70px;
+    height: 70px;
+}
+  .feature-card h3 {
+    color: #4b0082;
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .feature-card p {
+    color: #555;
+    font-size: 0.95rem;
+  }
+
+  /* ====== CTA SECTION ====== */
+  .cta {
+    text-align: center;
+    margin: 5rem 0 4rem;
+  }
+
+  .cta h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #4b0082;
+    margin-bottom: 1rem;
+  }
+
+  .cta p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .cta .btn {
+    background: linear-gradient(135deg, #8b5cf6, #c084fc);
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .cta .btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+  }
+</style>
+
+
+<div class="hero">
+  <h1>Welcome to <span style="color:#f3e8ff;">Comms</span></h1>
+  <p>Where talent meets opportunity.</p>
+  <p>Artists and clients meet for creative collaboration.  
+  Discover talented artists, request commissions, and bring your ideas to life.</p>
+  <a href="{{ path('app_commission_index') }}" class="btn-primary">Explore Commissions</a>
+</div>
+
+<section class="features">
+  <div class="feature-card">
+    <img src="/icons/art-palette.svg" alt="Art Palette Icon">
+    <h3>Creative Freedom</h3>
+    <p>Artists express their unique styles while clients get custom, one-of-a-kind pieces.</p>
+  </div>
+
+  <div class="feature-card">
+    <img src="/icons/safe-money.svg" alt="Safe Money Icon">
+    <h3>Safe & Secure</h3>
+    <p>All commissions are managed transparently with fair pricing and clear communication.</p>
+  </div>
+
+  <div class="feature-card">
+    <img src="/icons/cooperation.svg" alt="Cooperation Icon">
+    <h3>Vibrant Community</h3>
+    <p>Join a network of passionate creators and supporters sharing artistic visions.</p>
+  </div>
+</section>
+
+<section class="cta">
+  <h2>Ready to Start Your Next Project?</h2>
+  <p>Find the perfect artist for your vision or start accepting commissions today.</p>
+  <a href="{{ path('app_commission_new') }}" class="btn">Create a Commission</a>
+</section>
+{% endblock %}

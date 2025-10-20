@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commission{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9fafb;
+    }
+
+    .commission-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    h1 {
+        padding: 50px 0;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .timeline {
+        list-style-type: none;
+        position: relative;
+        padding-left: 40px;
+        margin-top: 20px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #370d46ff;
+        border-radius: 2px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -5px;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        background: #370d46ff;
+        border-radius: 50%;
+        border: 3px solid white;
+    }
+
+    .timeline-content {
+        background: #f3f4f6;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .timeline-content strong {
+        display: inline-block;
+        width: 120px;
+        color: #370d46ff;
+    }
+
+    .actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .btn-back {
+        background-color: #e5e7eb;
+        color: #333;
+    }
+
+    .btn-back:hover {
+        background-color: #d1d5db;
+    }
+
+    .btn-edit {
+        background-color: #370d46ff;
+        color: #fff;
+    }
+
+    .btn-edit:hover {
+        background-color: #370d46ff;
+    }
+
+    .btn-delete {
+        background-color: #dc2626;
+        color: #fff;
+    }
+
+    .btn-delete:hover {
+        background-color: #b91c1c;
+    }
+</style>
+
+<div class="commission-container">
+    <h1>Commission Details</h1>
+
+    <ul class="timeline">
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Id:</strong> {{ commission.id }}</div>
+        </li>
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Title:</strong> {{ commission.title }}</div>
+        </li>
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Description:</strong> {{ commission.description }}</div>
+        </li>
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Price:</strong> {{ commission.price }}</div>
+        </li>
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Category:</strong> {{ commission.category }}</div>
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Status:</strong> {{ commission.status }}</div>
+        </li>
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Created At:</strong> {{ commission.createdAt ? commission.createdAt|date('Y-m-d H:i:s') : '' }}</div>
+        </li>
+        <li class="timeline-item">
+            <div class="timeline-content"><strong>Updated At:</strong> {{ commission.updatedAt ? commission.updatedAt|date('Y-m-d H:i:s') : '' }}</div>
+        </li>
+    </ul>
+
+    <div class="actions">
+        <a href="{{ path('app_commission_index') }}" class="btn btn-back">Back to List</a>
+        <a href="{{ path('app_commission_edit', {'id': commission.id}) }}" class="btn btn-edit">Edit</a>
+        {{ include('commission/_delete_form.html.twig', {'attr': {'class': 'btn btn-delete'}}) }}
+    </div>
+</div>
+{% endblock %}
