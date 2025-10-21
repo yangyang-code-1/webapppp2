@@ -1,161 +1,84 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_base.html.twig' %}
 
-{% block title %}Commission{% endblock %}
+{% block title %}Commission Management{% endblock %}
+{% block header %}Commissions{% endblock %}
 
 {% block body %}
-<style>
-body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: rgba(255, 255, 255, 1)
-    }
+<div class="card p-4 shadow-sm border-0" style="border-radius: 12px; background: #fff;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold text-primary" style="color:#370d46ff;">Commission List</h4>
+    <a href="{{ path('app_commission_new') }}" class="btn btn-primary" style="background:#370d46ff;border:none;border-radius:50px;padding:8px 20px;">
+      <i class="bi bi-plus-circle me-1"></i> Create New
+    </a>
+  </div>
 
-    .commission-container {
-        max-width: 1000px;
-        margin: 40px auto;
-        padding: 0 20px;
-    }
-
-    h1 {
-        padding: 40px 0;
-        margin: 40px 0;
-        text-align: center;
-        font-size: 2rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20px;
-    }
-
-    table {
-        width: 95%;
-        border-collapse: collapse;
-        background-color: #fff;
-        border-radius: 5px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        margin-left: 30px;
-    }
-
-    th, td {
-        padding: 12px 16px;
-        text-align: left;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 0.95rem;
-        color: #333;
-    }
-
-    th {
-        background-color: #370d46ff;
-        color: #fff;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-weight: 600;
-    }
-
-    tr:last-child td {
-        border-bottom: none;
-    }
-
-    tr:hover {
-        background-color: #f3f4f6;
-    }
-
-    .actions a {
-        text-decoration: none;
-        color: #370d46ff;
-        font-weight: 500;
-        margin-right: 8px;
-        transition: color 0.2s;
-    }
-
-    .actions a:hover {
-        color: #370d46ff;
-    }
-
-    .btn-new {
-        display: inline-block;
-        margin-top: 20px;
-        background-color: #370d46ff;
-        color: #fff;
-        padding: 10px 20px;
-        border-radius: 9999px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: background-color 0.3s;
-        margin-left: 30px;
-    }
-
-    .btn-new:hover {
-        background-color: #370d46ff;
-    }
-    .btn-show, .btn-edit {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 9999px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: background-color 0.3s;
-    margin-right: 6px;
-}
-
-.btn-show {
-    background-color: #10b981; /* Emerald green */
-    color: #fff;
-}
-
-.btn-show:hover {
-    background-color: #059669;
-}
-
-.btn-edit {
-    background-color: #7c2abaff; /* Blue */
-    color: #fff;
-}
-
-.btn-edit:hover {
-    background-color: #7c2abaff;
-}
-</style>
-
-    <h1>Commissions</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Category</th>  {# New: Added category header #}
-                <th>Description</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+  <div class="table-responsive">
+    <table id="commissionTable" class="table table-striped table-hover align-middle">
+      <thead class="table-dark" style="background:#370d46ff;">
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Updated At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
         {% for commission in commissions %}
-            <tr>
-                <td>{{ commission.id }}</td>
-                <td>{{ commission.title }}</td>
-                <td>{{ commission.category ?: 'Uncategorized' }}</td>  {# New: Added category cell; fallback if null #}
-                <td>{{ commission.description }}</td>
-                <td>PHP{{ commission.price }}</td>  {# Minor: Added currency for clarity #}
-                <td>{{ commission.status }}</td>
-                <td>{{ commission.createdAt ? commission.createdAt|date('Y-m-d H:i') : '' }}</td>  {# Minor: Shortened date format #}
-                <td>{{ commission.updatedAt ? commission.updatedAt|date('Y-m-d H:i') : '' }}</td>  {# Minor: Shortened date format #}
-                <td>
-                    <a href="{{ path('app_commission_show', {'id': commission.id}) }}" class="btn-show">SHOW</a>
-                    <a href="{{ path('app_commission_edit', {'id': commission.id}) }}" class="btn-edit">EDIT</a>
-                </td>
-            </tr>
+          <tr>
+            <td>{{ commission.id }}</td>
+            <td>{{ commission.title }}</td>
+            <td>{{ commission.category ? commission.category.name : 'Uncategorized' }}</td>
+            <td>{{ commission.description|length > 50 ? commission.description|slice(0,50) ~ '...' : commission.description }}</td>
+            <td>₱{{ commission.price }}</td>
+            <td>
+              {% if commission.status == 'Completed' %}
+                <span class="badge bg-success">{{ commission.status }}</span>
+              {% elseif commission.status == 'Pending' %}
+                <span class="badge bg-warning text-dark">{{ commission.status }}</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ commission.status }}</span>
+              {% endif %}
+            </td>
+            <td>{{ commission.createdAt ? commission.createdAt|date('Y-m-d H:i') : '' }}</td>
+            <td>{{ commission.updatedAt ? commission.updatedAt|date('Y-m-d H:i') : '' }}</td>
+            <td>
+              <a href="{{ path('app_commission_show', {'id': commission.id}) }}" class="btn btn-success btn-sm rounded-pill">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ path('app_commission_edit', {'id': commission.id}) }}" class="btn btn-warning btn-sm rounded-pill text-white">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+            </td>
+          </tr>
         {% else %}
-            <tr>
-                <td colspan="9">no records found</td>  {# Updated: From 8 to 9 columns #}
-            </tr>
+          <tr>
+            <td colspan="9" class="text-center py-3 text-muted">No records found</td>
+          </tr>
         {% endfor %}
-        </tbody>
+      </tbody>
     </table>
+  </div>
+</div>
 
-    <a href="{{ path('app_commission_new') }}" class="btn-new">Create New</a>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    $('#commissionTable').DataTable({
+      pageLength: 5,
+      lengthMenu: [5, 10, 25, 50],
+      order: [[0, 'desc']],
+      language: {
+        search: "🔍 Search commissions:",
+        lengthMenu: "_MENU_ per page",
+        info: "Showing _START_ to _END_ of _TOTAL_ commissions",
+        zeroRecords: "No matching records found",
+        paginate: { next: "›", previous: "‹" }
+      }
+    });
+  });
+</script>
 {% endblock %}

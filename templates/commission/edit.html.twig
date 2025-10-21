@@ -1,13 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_base.html.twig' %}
 
 {% block title %}Edit Commission{% endblock %}
+{% block header %}Edit Commission{% endblock %}
 
 {% block body %}
 <style>
 body {
   flex: 1;
-  padding-top: 40px; /* Adjust based on navbar height; prevents overlap on all pages */
-  background-color: #f9f5ff; /* Light purple to match your index page; overrides body's rgb(200,162,200) for consistency */
+  background-color: #f9f5ff;
 }
 /* ====== COMMISSION FORM (ADMIN DASHBOARD) ====== */
 .commission-container {
@@ -180,66 +180,45 @@ body {
   transform: scale(1.03);
 }
 </style>
+<div class="card shadow-sm border-0 mt-4" style="border-radius: 16px; background: #fff;">
+  <div class="card-header text-white" style="background: linear-gradient(135deg, #370d46ff, #8b5cf6); border-top-left-radius: 16px; border-top-right-radius: 16px;">
+    <h5 class="mb-0 fw-semibold text-center">Edit Commission</h5>
+  </div>
+  <div class="card-body p-4">
+    {{ form_start(form, {'attr': {'class': 'commission-form'}}) }}
 
-<div class="commission-container">
-    <div class="commission-card">
-        <div class="commission-card-header">Edit Commission</div>
-        <div class="commission-card-body">
-            {# Flash messages #}
-            {% for message in app.flashes('success') %}
-                <div class="flash-message flash-success">{{ message }}</div>
-            {% endfor %}
-            {% for message in app.flashes('error') %}
-                <div class="flash-message flash-error">{{ message }}</div>
-            {% endfor %}
-
-            {# Edit form #}
-            {{ form_start(form, {'attr': {'class': 'commission-form'}}) }}
-                <div>
-                    {{ form_label(form.title, 'Commission Title') }}
-                    {{ form_widget(form.title) }}
-                    {{ form_errors(form.title) }}
-                </div>
-
-                <div>
-                    {{ form_label(form.description, 'Description') }}
-                    {{ form_widget(form.description, {'attr': {'rows': '5'}}) }}
-                    {{ form_errors(form.description) }}
-                </div>
-
-                {% if form.price is defined %}
-                    <div>
-                        {{ form_label(form.price, 'Price') }}
-                        {{ form_widget(form.price) }}
-                        {{ form_errors(form.price) }}
-                    </div>
-                {% endif %}
-
-                {% if form.category is defined %}
-                    <div>
-                        {{ form_label(form.category, 'Category') }}
-                        {{ form_widget(form.category) }}
-                        {{ form_errors(form.category) }}
-                    </div>
-                {% endif %}
-
-                {% if form.status is defined %}
-                    <div>
-                        {{ form_label(form.status, 'Status') }}
-                        {{ form_widget(form.status) }}
-                        {{ form_errors(form.status) }}
-                    </div>
-                {% endif %}
-
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn-update">Update Commission</button>
-                    <a href="{{ path('app_commission_index') }}" class="btn-back">Back to List</a>
-                </div>
-            {{ form_end(form) }}
-
-            {# Delete form #}
-            {{ include('commission/_delete_form.html.twig') }}
+      <div class="row g-3">
+        <div class="col-md-6">
+          {{ form_label(form.title, 'Title') }}
+          {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
         </div>
+        <div class="col-md-6">
+          {{ form_label(form.price, 'Price') }}
+          {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.category, 'Category') }}
+          {{ form_widget(form.category, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="col-md-6">
+          {{ form_label(form.status, 'Status') }}
+          {{ form_widget(form.status, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="col-12">
+          {{ form_label(form.description, 'Description') }}
+          {{ form_widget(form.description, {'attr': {'rows': 4, 'class': 'form-control'}}) }}
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button class="btn btn-primary px-4 py-2 rounded-pill" style="background:#370d46ff; border:none;">Update</button>
+        <a href="{{ path('app_commission_index') }}" class="btn btn-outline-secondary rounded-pill ms-2">Back</a>
+      </div>
+
+    {{ form_end(form) }}
+    <div class="mt-3 text-center">
+      {{ include('commission/_delete_form.html.twig') }}
     </div>
+  </div>
 </div>
 {% endblock %}

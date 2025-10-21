@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\CommissionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,49 +29,30 @@ class Commission
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
-    #[ORM\ManyToOne(inversedBy: 'commissionsCreated')]
-    #[ORM\JoinColumn(nullable: false)]
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'commissionsCreated')]
-    #[ORM\JoinColumn(nullable: true)]  // Adjust nullable as per your choice
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $artist = null;
-
-    public function getArtist(): ?User
-    {
-        return $this->artist;
-    }
-
-    public function setArtist(?User $artist): static
-    {
-        $this->artist = $artist;
-
-        return $this;
-    }
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'commissionsRequested')]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $client = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $category = null;
-
-    // #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'commissions')]
-    // private ?self $User = null;
-
-    // /**
-    //  * @var Collection<int, self>
-    //  */
-    // #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'User')]
-    // private Collection $commissions;
-
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'commissions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->commissions = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->title ?? 'Untitled Commission';
     }
 
     // Automatically update the 'updatedAt' field whenever the entity is changed
@@ -156,58 +135,36 @@ class Commission
         return $this;
     }
 
-    public function getCategory(): ?string
+    public function getArtist(): ?User
+    {
+        return $this->artist;
+    }
+
+    public function setArtist(?User $artist): static
+    {
+        $this->artist = $artist;
+        return $this;
+    }
+
+    public function getClient(): ?User
+    {
+        return $this->client;
+    }
+
+    public function setClient(?User $client): static
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory(string $category): static
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
-
         return $this;
     }
-
-    // public function getUser(): ?self
-    // {
-    //     return $this->User;
-    // }
-
-    // public function setUser(?self $User): static
-    // {
-    //     $this->User = $User;
-
-    //     return $this;
-    // }
-
-    // /**
-    //  * @return Collection<int, self>
-    //  */
-    // public function getCommissions(): Collection
-    // {
-    //     return $this->commissions;
-    // }
-
-    // public function addCommission(self $commission): static
-    // {
-    //     if (!$this->commissions->contains($commission)) {
-    //         $this->commissions->add($commission);
-    //         $commission->setUser($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeCommission(self $commission): static
-    // {
-    //     if ($this->commissions->removeElement($commission)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($commission->getUser() === $this) {
-    //             $commission->setUser(null);
-    //         }
-    //     }
-
-    //     return $this;
-    // }
-
 }

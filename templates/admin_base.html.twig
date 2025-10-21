@@ -1,0 +1,293 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+{% block header %}Overview{% endblock %}
+
+{% block body %}
+<style>
+  .stat-card {
+    background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15);
+  }
+
+  .stat-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover .stat-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .stat-card.purple .stat-icon {
+    background: linear-gradient(135deg, #7c3aed20, #a855f740);
+    color: #7c3aed;
+  }
+
+  .stat-card.blue .stat-icon {
+    background: linear-gradient(135deg, #3b82f620, #60a5fa40);
+    color: #3b82f6;
+  }
+
+  .stat-card.green .stat-icon {
+    background: linear-gradient(135deg, #10b98120, #34d39940);
+    color: #10b981;
+  }
+
+  .stat-card h5 {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .stat-card .stat-change {
+    font-size: 0.85rem;
+    color: #10b981;
+    margin-top: 0.5rem;
+  }
+
+  .stat-card .stat-change.negative {
+    color: #ef4444;
+  }
+
+  .section-title {
+    position: relative;
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #370d46ff;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    border-radius: 2px;
+  }
+
+  .table-container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+    border: 1px solid rgba(139, 92, 246, 0.1);
+  }
+
+  .table thead {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+  }
+
+  .table thead th {
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .table tbody tr:hover {
+    background-color: #f8f9ff;
+    transform: scale(1.01);
+  }
+
+  .table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    color: #475569;
+  }
+
+  .status-badge {
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .status-badge.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-badge.completed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-badge.in-progress {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-badge.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .price-tag {
+    font-weight: 700;
+    color: #7c3aed;
+    font-size: 1.05rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #64748b;
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+  }
+</style>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-5">
+  <div class="col-md-4">
+    <div class="stat-card purple">
+      <div class="stat-icon">
+        <i class="bi bi-palette-fill"></i>
+      </div>
+      <h5>Total Commissions</h5>
+      <p class="stat-number">{{ totalCommissions }}</p>
+      <p class="stat-change">
+        <i class="bi bi-arrow-up"></i> +3 this month
+      </p>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="stat-card blue">
+      <div class="stat-icon">
+        <i class="bi bi-person-badge-fill"></i>
+      </div>
+      <h5>Active Artists</h5>
+      <p class="stat-number">{{ activeArtists }}</p>
+      <p class="stat-change">
+        <i class="bi bi-arrow-up"></i> +2 this week
+      </p>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="stat-card green">
+      <div class="stat-icon">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <h5>Registered Clients</h5>
+      <p class="stat-number">{{ totalClients }}</p>
+      <p class="stat-change">
+        <i class="bi bi-arrow-up"></i> +5 this month
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Commissions Table -->
+<h3 class="section-title">
+  <i class="bi bi-clock-history me-2"></i>Recent Commissions
+</h3>
+
+{% if recentCommissions is empty %}
+<div class="table-container">
+  <div class="empty-state">
+    <i class="bi bi-inbox"></i>
+    <h5>No commissions found</h5>
+    <p>Commissions will appear here once they are created.</p>
+  </div>
+</div>
+{% else %}
+<div class="table-container">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Price</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for commission in recentCommissions %}
+      <tr>
+        <td><strong>#{{ '%03d'|format(commission.id) }}</strong></td>
+        <td>
+          <i class="bi bi-brush me-2" style="color: #7c3aed;"></i>
+          {{ commission.title }}
+        </td>
+        <td><span class="price-tag">₱{{ commission.price|number_format(2) }}</span></td>
+        <td><span class="status-badge {{ commission.status|lower|replace({' ': '-'}) }}">{{ commission.status }}</span></td>
+        <td>{{ commission.createdAt|date('Y-m-d') }}</td>
+        <td>
+          <a href="{{ path('commission_show', {id: commission.id}) }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-eye"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
