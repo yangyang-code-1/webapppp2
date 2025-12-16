@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Controller;
+namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AdminDashboardController extends AbstractController
+class AdminDashboardControllerTest extends WebTestCase
 {
-    #[Route('/admin_dashboard', name: 'app_admin_dashboard')]
-    public function index(): Response
+    public function testIndex(): void
     {
-        return $this->render('admin_dashboard/index.html.twig', [
-            'controller_name' => 'AdminDashboardController',
-        ]);
+        $client = static::createClient();
+        $client->request('GET', '/admin/dashboard');
+
+        $this->assertResponseIsSuccessful();
+        // Optional: assert the page contains the Dashboard header
+        $this->assertSelectorTextContains('h1', 'Dashboard');
     }
 }

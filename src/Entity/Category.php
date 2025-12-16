@@ -40,6 +40,20 @@ class Category
     #[ORM\OneToMany(targetEntity: Commission::class, mappedBy: 'category')]
     private Collection $commissions;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $createdBy = null;
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
     public function __construct()
     {
         $this->commissions = new ArrayCollection();
@@ -49,6 +63,7 @@ class Category
     {
         return $this->name ?? 'Unnamed Category';
     }
+
 
     public function getId(): ?int
     {

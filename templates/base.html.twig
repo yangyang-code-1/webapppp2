@@ -163,10 +163,17 @@
                         <img src="/PROFILE.png" alt="User Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
                     </div>
                     <ul id="avatar-dropdown" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                        <li><a href="\sample">Account</a></li>
-                        <li><a href="#">Commissions</a></li>
-                        <li><a href="#">Settings</a></li>
-                        <li><a href="#">Logout</a></li>
+                        {% if app.user %}
+                            <li><a href="\sample">Account</a></li>
+                            <li><a href="{{ path('app_commission_index') }}">Commissions</a></li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li><a href="{{ path('app_admin_dashboard') }}">Admin Dashboard</a></li>
+                            {% endif %}
+                            <li><a href="#">Settings</a></li>
+                            <li><a href="{{ path('app_logout') }}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{{ path('app_login') }}">Login</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

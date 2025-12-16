@@ -317,7 +317,7 @@
           </td>
           <td>{{ category.name }}</td>
           <td>{{ category.description|default('—')|slice(0, 50) }}{% if category.description|length > 50 %}...{% endif %}</td>          <td>
-            <span class="badge bg-primary">{{ category.commissions.count() }}</span>
+            <span class="badge bg-primary">{{ category.commissions|length }}</span>
           </td>
           <td>
             {% if category.isActive %}

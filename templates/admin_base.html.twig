@@ -1,293 +1,372 @@
-{% extends 'admin_base.html.twig' %}
+{# templates/admin_base.html.twig #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Admin Dashboard{% endblock %}</title>
 
-{% block title %}Admin Dashboard{% endblock %}
-{% block header %}Overview{% endblock %}
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-{% block body %}
-<style>
-  .stat-card {
-    background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    border: 1px solid rgba(139, 92, 246, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
+  <!-- DataTables -->
+  <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #7c3aed, #a855f7);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
+  <style>
+    :root{
+      --primary-color: #370d46;
+      --accent: #8b5cf6;
+      --bg-light: #f9f5ff;
+      --white: #fff;
+      --shadow: 0 6px 22px rgba(19,14,57,0.06);
+    }
+    html,body{height:100%}
+    body{
+      font-family: 'Poppins',sans-serif;
+      background: var(--bg-light);
+      margin:0;
+      display:flex;
+      min-height:100vh;
+      color:#2b2b2b;
+      overflow-x:hidden;
+    }
 
-  .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15);
-  }
+    /* sidebar */
+    .sidebar{
+      width:260px;
+      background: linear-gradient(135deg,var(--primary-color),var(--accent));
+      color:#fff;
+      padding:1.25rem .9rem;
+      position:fixed;
+      top:0;bottom:0;left:0;
+      z-index:1000;
+      transition:width .28s ease;
+      overflow:auto;
+    }
+    .sidebar.collapsed{width:76px}
+    .sidebar .brand{
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      margin-bottom:1.4rem;
+      white-space:nowrap;
+    }
+    .sidebar .brand i{font-size:1.25rem}
+    .sidebar nav a{
+      display:flex;
+      align-items:center;
+      gap:.75rem;
+      padding:.7rem .65rem;
+      border-radius:8px;
+      color:#fff;
+      text-decoration:none;
+      margin-bottom:.2rem;
+      transition:all .18s;
+    }
+    .sidebar nav a:hover, .sidebar nav a.active{
+      background: rgba(255,255,255,0.12);
+      transform:translateX(4px);
+    }
+    .sidebar nav a i{font-size:1.15rem}
+    .sidebar .small-muted{opacity:.85;font-size:.86rem}
 
-  .stat-card:hover::before {
-    transform: scaleX(1);
-  }
+    .sidebar .submenu{
+      padding-left:1rem;
+      display:block;
+    }
+    .sidebar.collapsed .submenu, .sidebar.collapsed .label-text{display:none}
 
-  .stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    transition: transform 0.3s ease;
-  }
+    /* main content */
+    .content{
+      margin-left:260px;
+      flex:1;
+      padding:1.6rem;
+      transition:margin-left .28s ease;
+    }
+    .collapsed + .content{margin-left:76px}
 
-  .stat-card:hover .stat-icon {
-    transform: scale(1.1) rotate(5deg);
-  }
+    /* header */
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:1rem;
+      margin-bottom:1.2rem;
+    }
+    .search-input{
+      background:#fff;border-radius:10px;padding:.45rem .7rem;box-shadow:var(--shadow);
+    }
 
-  .stat-card.purple .stat-icon {
-    background: linear-gradient(135deg, #7c3aed20, #a855f740);
-    color: #7c3aed;
-  }
+    /* cards & tables */
+    .stat-card{
+      background:#fff;border-radius:14px;padding:1rem;box-shadow:var(--shadow);min-height:90px;
+    }
+    table.dataTable{background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 
-  .stat-card.blue .stat-icon {
-    background: linear-gradient(135deg, #3b82f620, #60a5fa40);
-    color: #3b82f6;
-  }
+    /* responsive tweaks */
+    @media (max-width: 900px){
+      .sidebar{position:relative;width:100%;height:auto}
+      .content{margin-left:0;padding:1rem}
+    }
+  </style>
 
-  .stat-card.green .stat-icon {
-    background: linear-gradient(135deg, #10b98120, #34d39940);
-    color: #10b981;
-  }
-
-  .stat-card h5 {
-    color: #64748b;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.5rem;
-  }
-
-  .stat-card .stat-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0;
-  }
-
-  .stat-card .stat-change {
-    font-size: 0.85rem;
-    color: #10b981;
-    margin-top: 0.5rem;
-  }
-
-  .stat-card .stat-change.negative {
-    color: #ef4444;
-  }
-
-  .section-title {
-    position: relative;
-    display: inline-block;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #370d46ff;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-  }
-
-  .section-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #7c3aed, #a855f7);
-    border-radius: 2px;
-  }
-
-  .table-container {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    overflow: hidden;
-    border: 1px solid rgba(139, 92, 246, 0.1);
-  }
-
-  .table thead {
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    color: white;
-  }
-
-  .table thead th {
-    border: none;
-    padding: 1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-  }
-
-  .table tbody tr {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #f1f5f9;
-  }
-
-  .table tbody tr:hover {
-    background-color: #f8f9ff;
-    transform: scale(1.01);
-  }
-
-  .table tbody td {
-    padding: 1rem;
-    vertical-align: middle;
-    color: #475569;
-  }
-
-  .status-badge {
-    padding: 0.4rem 0.9rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    display: inline-block;
-  }
-
-  .status-badge.pending {
-    background: #fef3c7;
-    color: #92400e;
-  }
-
-  .status-badge.completed {
-    background: #d1fae5;
-    color: #065f46;
-  }
-
-  .status-badge.in-progress {
-    background: #dbeafe;
-    color: #1e40af;
-  }
-
-  .status-badge.cancelled {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-
-  .price-tag {
-    font-weight: 700;
-    color: #7c3aed;
-    font-size: 1.05rem;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: #64748b;
-  }
-
-  .empty-state i {
-    font-size: 4rem;
-    color: #cbd5e1;
-    margin-bottom: 1rem;
-  }
-</style>
-
-<!-- Statistics Cards -->
-<div class="row g-4 mb-5">
-  <div class="col-md-4">
-    <div class="stat-card purple">
-      <div class="stat-icon">
-        <i class="bi bi-palette-fill"></i>
+  {% block styles %}{% endblock %}
+</head>
+<body>
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <div>
+        <img src="/Primary Logo.png" alt="ArtComms Logo" style="height:40px; object-fit: contain;">
       </div>
-      <h5>Total Commissions</h5>
-      <p class="stat-number">{{ totalCommissions }}</p>
-      <p class="stat-change">
-        <i class="bi bi-arrow-up"></i> +3 this month
-      </p>
     </div>
-  </div>
-  
-  <div class="col-md-4">
-    <div class="stat-card blue">
-      <div class="stat-icon">
-        <i class="bi bi-person-badge-fill"></i>
-      </div>
-      <h5>Active Artists</h5>
-      <p class="stat-number">{{ activeArtists }}</p>
-      <p class="stat-change">
-        <i class="bi bi-arrow-up"></i> +2 this week
-      </p>
-    </div>
-  </div>
-  
-  <div class="col-md-4">
-    <div class="stat-card green">
-      <div class="stat-icon">
-        <i class="bi bi-people-fill"></i>
-      </div>
-      <h5>Registered Clients</h5>
-      <p class="stat-number">{{ totalClients }}</p>
-      <p class="stat-change">
-        <i class="bi bi-arrow-up"></i> +5 this month
-      </p>
-    </div>
-  </div>
-</div>
 
-<!-- Recent Commissions Table -->
-<h3 class="section-title">
-  <i class="bi bi-clock-history me-2"></i>Recent Commissions
-</h3>
+    <nav>
+  <nav>
+    {# ADMIN-ONLY: Dashboard #}
+    {% if is_granted('ROLE_ADMIN') %}
+      <a href="{{ path('app_admin_dashboard') }}" class="{% if app.request.get('_route') starts with 'app_admin_dashboard' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i> <span class="label-text">Dashboard</span>
+      </a>
+    {% endif %}
 
-{% if recentCommissions is empty %}
-<div class="table-container">
-  <div class="empty-state">
-    <i class="bi bi-inbox"></i>
-    <h5>No commissions found</h5>
-    <p>Commissions will appear here once they are created.</p>
-  </div>
-</div>
-{% else %}
-<div class="table-container">
-  <table class="table table-hover mb-0">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Price</th>
-        <th>Status</th>
-        <th>Date</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for commission in recentCommissions %}
-      <tr>
-        <td><strong>#{{ '%03d'|format(commission.id) }}</strong></td>
-        <td>
-          <i class="bi bi-brush me-2" style="color: #7c3aed;"></i>
-          {{ commission.title }}
-        </td>
-        <td><span class="price-tag">₱{{ commission.price|number_format(2) }}</span></td>
-        <td><span class="status-badge {{ commission.status|lower|replace({' ': '-'}) }}">{{ commission.status }}</span></td>
-        <td>{{ commission.createdAt|date('Y-m-d') }}</td>
-        <td>
-          <a href="{{ path('commission_show', {id: commission.id}) }}" class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-eye"></i>
+    {# BOTH ADMIN AND STAFF: Commissions #}
+    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+      <a href="{{ path('app_commission_index') }}" class="{% if app.request.get('_route') starts with 'app_commission' %}active{% endif %}">
+        <i class="bi bi-palette"></i> <span class="label-text">Commissions</span>
+        {% if commission_count is defined and commission_count > 0 %}
+          <span class="badge bg-light text-dark ms-auto">{{ commission_count }}</span>
+        {% endif %}
+      </a>
+    {% endif %}
+
+    {# BOTH ADMIN AND STAFF: Categories #}
+    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+      <a href="{{ path('app_category_index') }}" class="{% if app.request.get('_route') starts with 'app_category' %}active{% endif %}">
+        <i class="bi bi-folder2-open"></i> <span class="label-text">Categories</span>
+        {% if category_count is defined %}
+          <span class="badge bg-light text-dark ms-auto">{{ category_count }}</span>
+        {% endif %}
+      </a>
+    {% endif %}
+
+    {# ADMIN-ONLY: Users Section #}
+    {% if is_granted('ROLE_ADMIN') %}
+      <div class="mt-2">
+        <a href="#" id="usersToggle" class="">
+          <i class="bi bi-people"></i> <span class="label-text">Users</span>
+          <i class="bi bi-caret-down-fill ms-auto label-text"></i>
+        </a>
+        <div class="submenu" id="usersSubmenu">
+          <a href="{{ path('app_user_index', {'role': 'ROLE_ADMIN'}) }}" class="{% if app.request.get('_route') == 'app_user_index' and app.request.query.get('role') == 'ROLE_ADMIN' %}active{% endif %}">
+            <i class="bi bi-person-badge"></i> <span class="label-text">Admins</span>
           </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endif %}
-{% endblock %}
+          <a href="{{ path('app_user_index', {'role': 'ROLE_STAFF'}) }}" class="{% if app.request.get('_route') == 'app_user_index' and app.request.query.get('role') == 'ROLE_STAFF' %}active{% endif %}">
+            <i class="bi bi-briefcase"></i> <span class="label-text">Staff</span>
+            {% if staff_count is defined %}<span class="badge bg-light text-dark ms-auto">{{ staff_count }}</span>{% endif %}
+          </a>
+          <a href="{{ path('app_user_index', {'role': 'ROLE_USER'}) }}" class="{% if app.request.get('_route') == 'app_user_index' and app.request.query.get('role') == 'ROLE_USER' %}active{% endif %}">
+            <i class="bi bi-person"></i> <span class="label-text">Users</span>
+            {% if user_count is defined %}<span class="badge bg-light text-dark ms-auto">{{ user_count }}</span>{% endif %}
+          </a>
+        </div>
+      </div>
+
+      <a href="{{ path('app_activity_log_index') }}" class="{% if app.request.get('_route') starts with 'app_activity_log' %}active{% endif %}">
+        <i class="bi bi-clock-history"></i> <span class="label-text">Activity Logs</span>
+      </a>
+
+      {# <a href="#" class="" onclick="alert('Transactions feature coming soon!')">
+        <i class="bi bi-receipt"></i> <span class="label-text">Transactions</span>
+        <span class="badge bg-warning text-dark ms-auto">Soon</span>
+      </a>
+
+      <a href="#" class="" onclick="alert('Reports feature coming soon!')">
+        <i class="bi bi-bar-chart"></i> <span class="label-text">Reports</span>
+        <span class="badge bg-warning text-dark ms-auto">Soon</span>
+      </a>
+
+      <a href="#" class="" onclick="alert('Settings feature coming soon!')">
+        <i class="bi bi-gear"></i> <span class="label-text">Settings</span>
+        <span class="badge bg-warning text-dark ms-auto">Soon</span>
+      </a> #}
+    {% endif %}
+  </nav>
+
+    <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;font-size:.85rem;color:rgba(255,255,255,0.9)">
+      <div>Signed in as <strong>{{ app.user ? (app.user.name ?? 'Admin') : 'Admin' }}</strong></div>
+    </div>
+  </aside>
+
+  <main id="content" class="content">
+    <div class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-list" id="sidebarToggle" style="font-size:1.5rem;cursor:pointer;color:var(--primary-color)"></i>
+        <h4 class="mb-0">{% block header %}Dashboard{% endblock %}</h4>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <div class="search-input d-flex align-items-center gap-2">
+          <i class="bi bi-search"></i>
+          <input class="form-control border-0 p-0" style="width:220px" placeholder="Search..." />
+        </div>
+
+        <div class="position-relative">
+          <i class="bi bi-bell" style="font-size:1.2rem;cursor:pointer"></i>
+          {% if notifications_count is defined and notifications_count > 0 %}
+            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle"></span>
+          {% endif %}
+        </div>
+
+        <div class="dropdown">
+          <a class="d-flex align-items-center text-decoration-none" href="#" id="userMenu" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle" style="font-size:1.6rem;color:var(--primary-color)"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+            <li><a class="dropdown-item" href="#" onclick="alert('Profile feature coming soon!')">
+              <i class="bi bi-person-circle me-2"></i>Profile
+            </a></li>
+            <li><a class="dropdown-item" href="{{ path('app_logout') }}">
+              <i class="bi bi-box-arrow-right me-2"></i>Logout
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      {% block body %}
+      {# Default dashboard body: quick stats + recent commissions #}
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="small-muted">Total Commissions</div>
+                <div style="font-weight:700;font-size:1.15rem">{{ commission_count|default(0) }}</div>
+              </div>
+              <i class="bi bi-palette" style="font-size:1.7rem;color:var(--accent)"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="small-muted">Staff</div>
+                <div style="font-weight:700">{{ staff_count|default(0) }}</div>
+              </div>
+              <i class="bi bi-briefcase" style="font-size:1.7rem;color:var(--accent)"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="small-muted">Users</div>
+                <div style="font-weight:700">{{ user_count|default(0) }}</div>
+              </div>
+              <i class="bi bi-person" style="font-size:1.7rem;color:var(--accent)"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="small-muted">Categories</div>
+                <div style="font-weight:700">{{ category_count|default(0) }}</div>
+              </div>
+              <i class="bi bi-folder2-open" style="font-size:1.7rem;color:var(--accent)"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Recent Commissions</h5>
+          <div class="table-responsive">
+            <table id="commissionsTable" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Title</th>
+                  <th>Client</th>
+                  <th>Artist</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in recent_commissions|default([]) %}
+                  <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ c.title }}</td>
+                    <td>{{ c.client ? c.client.name : '—' }}</td>
+                    <td>{{ c.artist ? c.artist.name : '—' }}</td>
+                    <td>{{ c.status }}</td>
+                    <td>{{ c.createdAt ? c.createdAt|date('Y-m-d H:i') : '—' }}</td>
+                  </tr>
+                {% else %}
+                  <tr><td colspan="6" class="text-center">No recent commissions</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endblock %}
+    </div>
+  </main>
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- DataTables -->
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+  <script>
+    // toggle sidebar collapse
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      document.getElementById('content').classList.toggle('collapsed');
+    });
+
+    // users submenu toggle
+    document.getElementById('usersToggle').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('usersSubmenu').classList.toggle('d-none');
+    });
+
+    // datatable init (tables that exist)
+    //$(document).ready(function(){
+    //  if (document.getElementById('commissionsTable')) {
+    //    $('#commissionsTable').DataTable({
+    //    pageLength:5,
+    //    lengthMenu:[5,10,25],
+    //    language:{search: "🔍 Search:"}
+    //    });
+    //  }
+    //  if (document.getElementById('recentCommissionsTable')) {
+    //    $('#recentCommissionsTable').DataTable({
+    //      pageLength:5,
+    //      lengthMenu:[5,10,25],
+    //      language:{search: "🔍 Search:"}
+    //    });
+    //  }
+    //}); 
+    // DUPLICATE NI
+  </script>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

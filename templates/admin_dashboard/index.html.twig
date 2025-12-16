@@ -68,6 +68,11 @@
     color: #10b981;
   }
 
+  .stat-card.orange .stat-icon {
+    background: linear-gradient(135deg, #f9731620, #fb923c40);
+    color: #f97316;
+  }
+
   .stat-card h5 {
     color: #64748b;
     font-size: 0.9rem;
@@ -121,6 +126,7 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     overflow: hidden;
     border: 1px solid rgba(139, 92, 246, 0.1);
+    margin-bottom: 2rem;
   }
 
   .table thead {
@@ -181,50 +187,119 @@
     color: #991b1b;
   }
 
+  .action-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .action-badge.login {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .action-badge.logout {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
+  .action-badge.create {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .action-badge.update {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .action-badge.delete {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
   .price-tag {
     font-weight: 700;
     color: #7c3aed;
     font-size: 1.05rem;
   }
+
+  .role-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .role-badge.admin {
+    background: linear-gradient(135deg, #ef444420, #f8717140);
+    color: #991b1b;
+  }
+
+  .role-badge.staff {
+    background: linear-gradient(135deg, #3b82f620, #60a5fa40);
+    color: #1e40af;
+  }
+
+  .role-badge.user {
+    background: linear-gradient(135deg, #10b98120, #34d39940);
+    color: #065f46;
+  }
 </style>
 
 <!-- Statistics Cards -->
 <div class="row g-4 mb-5">
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="stat-card purple">
       <div class="stat-icon">
         <i class="bi bi-palette-fill"></i>
       </div>
       <h5>Total Commissions</h5>
-      <p class="stat-number">12</p>
+      <p class="stat-number">{{ commission_count|default(0) }}</p>
       <p class="stat-change">
-        <i class="bi bi-arrow-up"></i> +3 this month
+        <i class="bi bi-graph-up"></i> All time
       </p>
     </div>
   </div>
   
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="stat-card blue">
       <div class="stat-icon">
         <i class="bi bi-person-badge-fill"></i>
       </div>
-      <h5>Active Artists</h5>
-      <p class="stat-number">8</p>
+      <h5>Staff Members</h5>
+      <p class="stat-number">{{ staff_count|default(0) }}</p>
       <p class="stat-change">
-        <i class="bi bi-arrow-up"></i> +2 this week
+        <i class="bi bi-check-circle"></i> Active
       </p>
     </div>
   </div>
   
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="stat-card green">
       <div class="stat-icon">
         <i class="bi bi-people-fill"></i>
       </div>
-      <h5>Registered Clients</h5>
-      <p class="stat-number">15</p>
+      <h5>Registered Users</h5>
+      <p class="stat-number">{{ user_count|default(0) }}</p>
       <p class="stat-change">
-        <i class="bi bi-arrow-up"></i> +5 this month
+        <i class="bi bi-person-check"></i> Total
+      </p>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="stat-card orange">
+      <div class="stat-icon">
+        <i class="bi bi-folder2-open"></i>
+      </div>
+      <h5>Categories</h5>
+      <p class="stat-number">{{ category_count|default(0) }}</p>
+      <p class="stat-change">
+        <i class="bi bi-list-check"></i> Active
       </p>
     </div>
   </div>
@@ -232,15 +307,17 @@
 
 <!-- Recent Commissions Table -->
 <h3 class="section-title">
-  <i class="bi bi-clock-history me-2"></i>Recent Commissions
+  <i class="bi bi-brush me-2"></i>Recent Commissions
 </h3>
 
 <div class="table-container">
-  <table class="table table-hover mb-0 data-table">
+  <table class="table table-hover mb-0" id="recentCommissionsTable">
     <thead>
       <tr>
         <th>ID</th>
         <th>Title</th>
+        <th>Client</th>
+        <th>Artist</th>
         <th>Price</th>
         <th>Status</th>
         <th>Date</th>
@@ -248,67 +325,152 @@
       </tr>
     </thead>
     <tbody>
+      {% for c in recent_commissions|default([]) %}
       <tr>
-        <td><strong>#001</strong></td>
+        <td><strong>#{{ c.id }}</strong></td>
         <td>
           <i class="bi bi-brush me-2" style="color: #7c3aed;"></i>
-          Chibi Art
+          {{ c.title }}
         </td>
-        <td><span class="price-tag">₱25.00</span></td>
-        <td><span class="status-badge pending">Pending</span></td>
-        <td>2025-10-03</td>
+        <td>{{ c.client ? c.client.name : '—' }}</td>
+        <td>{{ c.artist ? c.artist.name : '—' }}</td>
+        <td><span class="price-tag">₱{{ c.price|number_format(2, '.', ',') }}</span></td>
         <td>
-          <button class="btn btn-sm btn-outline-primary">
+          <span class="status-badge {{ c.status|lower|replace({' ': '-'}) }}">{{ c.status }}</span>
+        </td>
+        <td>{{ c.createdAt ? c.createdAt|date('Y-m-d') : '—' }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{{ path('app_commission_show', {'id': c.id}) }}">
             <i class="bi bi-eye"></i>
-          </button>
+          </a>
         </td>
       </tr>
+      {% else %}
       <tr>
-        <td><strong>#002</strong></td>
-        <td>
-          <i class="bi bi-brush me-2" style="color: #7c3aed;"></i>
-          Character Design
-        </td>
-        <td><span class="price-tag">₱40.00</span></td>
-        <td><span class="status-badge completed">Completed</span></td>
-        <td>2025-10-04</td>
-        <td>
-          <button class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-eye"></i>
-          </button>
+        <td colspan="8" class="text-center py-4">
+          <i class="bi bi-inbox" style="font-size: 2rem; color: #cbd5e1;"></i>
+          <p class="text-muted mt-2">No recent commissions</p>
         </td>
       </tr>
-      <tr>
-        <td><strong>#003</strong></td>
-        <td>
-          <i class="bi bi-brush me-2" style="color: #7c3aed;"></i>
-          Logo Design
-        </td>
-        <td><span class="price-tag">₱50.00</span></td>
-        <td><span class="status-badge in-progress">In Progress</span></td>
-        <td>2025-10-05</td>
-        <td>
-          <button class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-eye"></i>
-          </button>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>#004</strong></td>
-        <td>
-          <i class="bi bi-brush me-2" style="color: #7c3aed;"></i>
-          Portrait Drawing
-        </td>
-        <td><span class="price-tag">₱35.00</span></td>
-        <td><span class="status-badge pending">Pending</span></td>
-        <td>2025-10-06</td>
-        <td>
-          <button class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-eye"></i>
-          </button>
-        </td>
-      </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
+
+<!-- Recent Activity Logs -->
+<h3 class="section-title mt-4">
+  <i class="bi bi-clock-history me-2"></i>Recent Activity
+</h3>
+
+<div class="table-container">
+  <table class="table table-hover mb-0" id="recentActivityTable">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Role</th>
+        <th>Action</th>
+        <th>Description</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for activity in recent_activities|default([]) %}
+      <tr>
+        <td>
+          <i class="bi bi-person-circle me-2" style="color: #7c3aed;"></i>
+          <strong>{{ activity.user.name }}</strong>
+        </td>
+        <td>
+          {% if activity.role == 'ROLE_ADMIN' %}
+            <span class="role-badge admin">
+              <i class="bi bi-shield-check"></i> Admin
+            </span>
+          {% elseif activity.role == 'ROLE_STAFF' %}
+            <span class="role-badge staff">
+              <i class="bi bi-briefcase"></i> Staff
+            </span>
+          {% else %}
+            <span class="role-badge user">
+              <i class="bi bi-person"></i> User
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% set action = activity.action|upper %}
+          <span class="action-badge {{ action|lower }}">
+            {% if action == 'LOGIN' %}
+              <i class="bi bi-box-arrow-in-right"></i> Login
+            {% elseif action == 'LOGOUT' %}
+              <i class="bi bi-box-arrow-right"></i> Logout
+            {% elseif action == 'CREATE' %}
+              <i class="bi bi-plus-circle"></i> Create
+            {% elseif action == 'UPDATE' %}
+              <i class="bi bi-pencil"></i> Update
+            {% elseif action == 'DELETE' %}
+              <i class="bi bi-trash"></i> Delete
+            {% else %}
+              {{ action }}
+            {% endif %}
+          </span>
+        </td>
+        <td>{{ activity.description }}</td>
+        <td>
+          <small class="text-muted">
+            <i class="bi bi-clock"></i>
+            {{ activity.createdAt|date('Y-m-d H:i:s') }}
+          </small>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" class="text-center py-4">
+          <i class="bi bi-inbox" style="font-size: 2rem; color: #cbd5e1;"></i>
+          <p class="text-muted mt-2">No recent activity</p>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  {% if recent_activities|length > 0 %}
+  <div class="p-3 text-end border-top">
+    <a href="{{ path('app_activity_log_index') }}" class="btn btn-sm btn-outline-primary">
+      View All Activity Logs <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function(){
+    if (document.getElementById('recentCommissionsTable')) {
+      $('#recentCommissionsTable').DataTable({
+        pageLength: 5,
+        lengthMenu: [5, 10, 25],
+        order: [[0, 'desc']],
+        language: {
+          search: "🔍 Search:",
+          lengthMenu: "_MENU_ per page",
+          info: "Showing _START_ to _END_ of _TOTAL_ commissions"
+        }
+      });
+    }
+
+    if (document.getElementById('recentActivityTable')) {
+      $('#recentActivityTable').DataTable({
+        pageLength: 5,
+        lengthMenu: [5, 10, 25],
+        order: [[4, 'desc']], // Sort by timestamp
+        language: {
+          search: "🔍 Search:",
+          lengthMenu: "_MENU_ per page",
+          info: "Showing _START_ to _END_ of _TOTAL_ activities"
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}

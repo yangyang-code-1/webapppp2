@@ -1,374 +1,836 @@
-{% extends 'base.html.twig' %}
 
-{% block title %}Artist Profile{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artist Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --secondary: #c084fc;
+      --accent: #370d46;
+      --bg-light: #f9f5ff;
+    }
 
-{% block body %}
-<style>
-main{
-  background-color: #fff;
-}
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #7c3aed, #a855f7);
-  font-family: 'Inter', sans-serif;
-}
-.artist-header {
-    background: rgb(218, 192, 245);
-    padding: 2rem 1.5rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-}
-.artist-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin-top: 40px;
-}
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
+    body {
+      background: var(--bg-light);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
 
-.product-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: box-shadow 0.2s;
-}
+    /* Your Original Navbar Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      padding: 1rem 2rem;
+    }
 
-.product-card:hover,
-.portfolio-card:hover {
-  transform: translateY(-4px);
-  transition: transform 0.2s ease;
-}
+    .navbar a.nav-link,
+    .navbar .navbar-brand {
+      color: #4b0082 !important;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      text-decoration: none;
+    }
 
-.product-image {
-    width: 100%;
-    max-width: 200px;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-}
+    .navbar a.nav-link:hover {
+      color: #7c3aed !important;
+    }
 
-.product-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    text-align: center;
-}
+    .navbar .flex-1 {
+      flex: 1;
+    }
 
-/* Product Image Modal Styles */
-#product-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.7);
-    align-items: center;
-    justify-content: center;
-}
-#product-modal.active {
-    display: flex;
-}
-#product-modal .modal-content {
-    position: relative;
-    background: #fff;
-    padding: 1.5rem 1rem;
-    border-radius: 12px;
-    max-width: 90vw;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-}
-#product-modal .close {
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    font-size: 2rem;
-    cursor: pointer;
-}
-#product-modal-img {
-    width: 300px;
-    max-width: 100%;
-    max-height: 60vh;
-    border-radius: 8px;
-}
+    .navbar .flex-none {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
 
-.artist-profile {
-    margin-top: 2rem;
-}
+    .input-search {
+      background: rgba(255,255,255,0.95) !important;
+      border: 1px solid rgba(0,0,0,0.06) !important;
+      border-radius: 10px !important;
+      padding: 0.55rem 0.9rem !important;
+      width: 220px !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+    }
 
-.product-price {
-    color: #2d8f2d;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
+    .btn-ghost {
+      background: transparent;
+      border: none;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
 
-.product-description {
-    font-size: 0.95rem;
-    color: #555;
-    text-align: center;
-}
+    .btn-circle {
+      border-radius: 50%;
+    }
 
-.modal {
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; 
-  height: 100%;
-  overflow: auto;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  position: relative;
-  max-width: 400px;
-  width: 100%;
-}
-.modal-content.modal-flex {
-    width: 1800px;
-    height: 720px;
-    max-width: 100%;
-    padding: 1.5rem 1rem;
-    border-radius: 12px;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.close {
-  position: absolute;
-  top: 1rem; right: 1rem;
-  font-size: 2rem;
-  cursor: pointer;
-}
+    .avatar img {
+      border: 2px solid #7c3aed !important;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
 
-.portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
+    .avatar img:hover {
+      transform: scale(1.1);
+    }
 
-.portfolio-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 180px;
-}
+    .dropdown {
+      position: relative;
+    }
 
-.portfolio-image {
-    width: 100%;
-    max-width: 180px;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-}
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      padding: 0.5rem;
+      min-width: 200px;
+      z-index: 1001;
+    }
 
-.portfolio-title {
-    font-size: 1rem;
-    font-weight: 500;
-    text-align: center;
-}
-.btn.btn-success,
-.btn-tab {
-  background: #fff;
-  border: 2px solid #370d46ff;
-  border-radius: 9999px;
-  color: #370d46ff;
-  padding: 0.5rem 1.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.btn-tab:hover {
-  background: #370d46ff;
-  color: #fff;
-}
-.btn-tab.active {
-  background: #370d46ff;
-  color: #fff;
-  margin-left: 35rem;
-}
-:root {
-  --bg-main: #f0aafeff;
-  --bg-header: #dac0f5;
-  --accent: #370d46;
-  --text-dark: #333;
-  --text-muted: #555;
-}
-.btn-request {
-  background-color: #370d46; /* deep purple accent */
-  color: #fff;
-  border: none;
-  border-radius: 9999px;
-  padding: 0.5rem 1.5rem;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: background 0.3s ease;
-  display: inline-block;
-  margin-bottom: 2rem;
-  margin-left: 75rem;
-  margin-right: 2rem;
-}
+    .dropdown-content.show {
+      display: block;
+    }
 
-.btn-request:hover {
-  background-color: #4e1763;
-}
-</style>
+    .dropdown-content li {
+      list-style: none;
+    }
 
-<section class="container mx-auto px-4 py-6">
-  <header class="artist-header">
-    <img src="/PROFILE.png" alt="Artist Avatar" class="artist-avatar" style="">
-    <form style="flex:1;">
-      <h2 class="text-2xl font-bold mb-2">Artist Name</h2>
-      <p class="mb-2">Digital artist specializing in character commissions. Open for new projects!</p>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-        <div>
-          <span style="font-weight:600;">Location:</span>
-          <span>Example City</span>
-        </div>
-        <div>
-          <span style="font-weight:600;">Experience:</span>
-          <span>5+ years</span>
-        </div>
-        <div>
-          <span style="font-weight:600;">Contact:</span>
-          <span>artist@email.com</span>
+    .dropdown-content a {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.7rem 1rem;
+      color: #333 !important;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-content a:hover {
+      background: #f9f5ff;
+      color: #7c3aed !important;
+    }
+
+    /* Artist Header */
+    .artist-header {
+      background: linear-gradient(135deg, #ebd3feff, #c084fc);
+      padding: 5rem 2rem 2rem;
+      margin-top: 60px;
+      margin-bottom: 2rem;
+      border-radius: 0 0 30px 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .artist-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .artist-avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+    }
+
+    .artist-avatar:hover {
+      transform: scale(1.05);
+    }
+
+    .artist-info {
+      flex: 1;
+      color: white;
+    }
+
+    .artist-info h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .artist-bio {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    .artist-stats {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-item i {
+      font-size: 1.2rem;
+    }
+
+    .stat-item span {
+      font-weight: 600;
+    }
+
+    /* Tabs */
+    .tabs-container {
+      max-width: 1200px;
+      margin: 0 auto 2rem;
+      padding: 0 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-tab {
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 25px;
+      color: var(--primary);
+      padding: 0.7rem 2rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
+    }
+
+    .btn-tab:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-request {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 0.7rem 2rem;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-request:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.4);
+    }
+
+    /* Content Container */
+    .content-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+    }
+
+    /* Commission Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.15);
+    }
+
+    .product-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+      transform: scale(1.05);
+    }
+
+    .product-info {
+      padding: 1.5rem;
+    }
+
+    .product-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .product-price {
+      color: #10b981;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-description {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .product-category {
+      display: inline-block;
+      background: var(--bg-light);
+      color: var(--primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    /* Portfolio Grid */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .portfolio-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .portfolio-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.15);
+    }
+
+    .portfolio-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .portfolio-card:hover .portfolio-image {
+      transform: scale(1.08);
+    }
+
+    .portfolio-info {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .portfolio-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-like {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-like:hover,
+    .btn-like.liked {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.3s ease;
+      background: none;
+      border: none;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .modal-close:hover {
+      color: var(--primary);
+      background: var(--bg-light);
+    }
+
+    .modal-body {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .modal-image {
+      max-width: 400px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .modal-info {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .modal-info h2 {
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .modal-info .price {
+      color: #10b981;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .modal-info .description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar .flex-none {
+        gap: 1rem;
+      }
+
+      .input-search {
+        width: 150px !important;
+      }
+
+      .artist-container {
+        text-align: center;
+        flex-direction: column;
+      }
+
+      .artist-info h1 {
+        font-size: 2rem;
+      }
+
+      .artist-stats {
+        justify-content: center;
+      }
+
+      .tabs-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .product-grid,
+      .portfolio-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+
+      .modal-body {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Your Original Navbar -->
+  <header>
+    <nav class="navbar" style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="flex-1">
+        <a class="btn btn-ghost" href="#home">
+          <img src="{{ asset('Primary Logo.png') }}" alt="ArtComms Logo" style="height:40px; object-fit: contain;">
+        </a>
+      </div>
+
+      <div class="flex-none items-center" style="display: flex; align-items: center; gap: 1.5rem;">
+        <input type="text" placeholder="Search" class="input-search"/>
+        
+        <div class="dropdown dropdown-end" style="position:relative;">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar" onclick="toggleDropdown()">
+            <img src="{{ asset('SampleProfile.jpg') }}" alt="User Avatar">
+          </div>
+          <ul id="avatar-dropdown" class="dropdown-content">
+            <a href="{{ path('app_sample') }}"><i class="bi bi-person-circle me-2"></i>Account</a>
+            <a href="{{ path('app_commission_index') }}"><i class="bi bi-palette me-2"></i>Commissions</a>
+            <a href="{{ path('app_admin_dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a>
+            <li><a href="#settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
+            <a href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
+          </ul>
         </div>
       </div>
-    </form>
+    </nav>
   </header>
-        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem;">
-        <button id="show-commissions" class="btn-tab active">Commission Offers</button>
-        <button id="show-portfolio" class="btn-tab">Portfolio</button>
-      </div>
-      <div id="commissions-section">
-        <div class="product-grid">
-          {# {% for commission in commissions %}
-            <div class="product-card">
-              <img src="{{ asset('uploads/' ~ commission.image) }}" 
-                  alt="{{ commission.title }}" 
-                  class="product-image" 
-                  onclick="showProductModal(this.src, '{{ commission.title }}', '₱{{ commission.price }}', '{{ commission.description }}')">
-              <div class="product-title">{{ commission.title }}</div>
-              <div class="product-price">₱{{ commission.price }}</div>
-              <div class="product-description">{{ commission.category }}</div>
-            </div>
-          {% endfor %}
-        </div> #}
-          <div class="product-card">
-            <img src="/FINAL.png" alt="FINAL" class="product-image" style="cursor:pointer;" onclick="showProductModal(this.src, 'Commissions', 'From $50', 'Full Body')" />
-            <div class="product-title">Commissions</div>
-            <div class="product-price">From $50</div>
-            <div class="product-description">Full Body</div>
+  <!-- Artist Header -->
+  <header class="artist-header">
+    <div class="artist-container">
+      <img src="/SampleProfile.jpg" alt="Artist Avatar" class="artist-avatar">
+      
+      <div class="artist-info">
+        <h1>Sample Artist</h1>
+        <p class="artist-bio">Digital artist specializing in character design and illustration. Passionate about bringing creative visions to life through unique and vibrant art styles.</p>
+        
+        <div class="artist-stats">
+          <div class="stat-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>Philippines</span>
           </div>
-          <div class="product-card">
-            <img src="/FINAL.png" alt="FINAL" class="product-image" style="cursor:pointer;" onclick="showProductModal(this.src, 'Commissions', 'From $50', 'Full Body')" />
-            <div class="product-title">Commissions</div>
-            <div class="product-price">From $50</div>
-            <div class="product-description">Full Body</div>
+          <div class="stat-item">
+            <i class="bi bi-award-fill"></i>
+            <span>5+ Years Experience</span>
           </div>
-          <div class="product-card">
-            <img src="/FINAL.png" alt="FINAL" class="product-image" style="cursor:pointer;" onclick="showProductModal(this.src, 'Commissions', 'From $50', 'Full Body')" />
-            <div class="product-title">Commissions</div>
-            <div class="product-price">From $50</div>
-            <div class="product-description">Full Body</div>
+          <div class="stat-item">
+            <i class="bi bi-envelope-fill"></i>
+            <span>sample.art@email.com</span>
           </div>
-          <!-- Add more product-card divs for other offers -->
         </div>
       </div>
-      <div id="portfolio-section" style="display:none;">
-        <div class="portfolio-grid">
-          <!-- ...your portfolio cards here... -->
-      <div class="portfolio-grid">
-        <div class="portfolio-card">
-            <img src="/4.png" alt="Portfolio 1" class="portfolio-image" style="cursor:pointer;" onclick="showProductModal(this.src)" />
-            <div class="portfolio-title">Artwork Title</div>
-            <button class="btn btn-like" onclick="toggleLike(this)">
-              <span>&#x1F44D;</span> 
-            </button>
-        </div>
-      </div>
-        </div>
-      </div>
-        <script>
-          const commissionsBtn = document.getElementById('show-commissions');
-          const portfolioBtn = document.getElementById('show-portfolio');
-          commissionsBtn.onclick = function() {
-            document.getElementById('commissions-section').style.display = '';
-            document.getElementById('portfolio-section').style.display = 'none';
-            commissionsBtn.classList.add('active');
-            portfolioBtn.classList.remove('active');
-          };
-          portfolioBtn.onclick = function() {
-            document.getElementById('commissions-section').style.display = 'none';
-            document.getElementById('portfolio-section').style.display = '';
-            portfolioBtn.classList.add('active');
-            commissionsBtn.classList.remove('active');
-          };
-        </script>
-        <script>
-            function showProductModal(src, title = '', price = '', desc = '') {
-              var modal = document.getElementById('product-modal');
-              var modalImg = document.getElementById('product-modal-img');
-              var modalTitle = document.getElementById('product-modal-title');
-              var modalPrice = document.getElementById('product-modal-price');
-              var modalDesc = document.getElementById('product-modal-desc');
-              modal.style.display = 'flex';
-              modalImg.src = src;
-              if (modalTitle) modalTitle.textContent = title;
-              if (modalPrice) modalPrice.textContent = price;
-              if (modalDesc) modalDesc.textContent = desc;
-            }
-            function closeProductModal() {
-              document.addEventListener('keydown', function(e) {
-                if (e.key === 'Esc') closeProductModal();
-              });
-            }
-            function toggleLike(btn) {
-              btn.classList.toggle('liked');
-              btn.innerHTML = btn.classList.contains('liked') ? '💖' : '👍';
-            }
-        </script>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <div class="tabs">
+      <button id="show-commissions" class="btn-tab active">
+        <i class="bi bi-palette me-2"></i>Commission Offers
+      </button>
+      <button id="show-portfolio" class="btn-tab">
+        <i class="bi bi-images me-2"></i>Portfolio
+      </button>
+    </div>
+    <button class="btn-request">
+      <i class="bi bi-plus-circle me-2"></i>Request Commission
+    </button>
   </div>
-      <div id="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">  
-            <span class="close" onclick="closeProductModal()">&times;</span>
-            <div style="display:flex;flex-direction:row;align-items:center;gap:2rem;">
-              <img id="product-modal-img" src="" alt="Product" style="max-width:300px;max-height:60vh;border-radius:8px;"/>
-              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:200px;">
-                <div id="product-modal-title" class="product-title" style="margin-bottom:1rem;"></div>
-                <div id="product-modal-price" class="product-price" style="margin-bottom:1rem;"></div>
-                <div id="product-modal-desc" class="product-description"></div>
-              </div>
-            </div>
+
+  <!-- Content -->
+  <div class="content-container">
+    <!-- Commissions Section -->
+    <div id="commissions-section">
+      <div class="product-grid">
+        <!-- Commission Card 1 -->
+        <div class="product-card">
+          <img src="{{ asset('4.png') }}" 
+               alt="Character Design" 
+               class="product-image" 
+               onclick="showModal('Character Design Commission', '$75', 'Full-body character design with detailed background and color variations. Perfect for D&D characters, OCs, and game avatars.', this.src)">
+          <div class="product-info">
+            <div class="product-title">Character Design</div>
+            <div class="product-price">From $75</div>
+            <div class="product-description">Full-body character with background</div>
+            <span class="product-category">Digital Art</span>
           </div>
+        </div>
+
+        <!-- Commission Card 2 -->
+        <div class="product-card">
+          <img src="{{ asset('Portrait Art.jpg') }}" 
+               alt="Portrait Art" 
+               class="product-image" 
+               onclick="showModal('Portrait Commission', '$50', 'Detailed bust or headshot portrait in my signature style. Great for profile pictures and gifts.', this.src)">
+          <div class="product-info">
+            <div class="product-title">Portrait Art</div>
+            <div class="product-price">From $50</div>
+            <div class="product-description">Detailed bust or headshot</div>
+            <span class="product-category">Portrait</span>
+          </div>
+        </div>
+
+        <!-- Commission Card 3 -->
+        <div class="product-card">
+          <img src="{{ asset('CustomIllustration.jpg') }}" 
+               alt="Illustration" 
+               class="product-image" 
+               onclick="showModal('Custom Illustration', '$100', 'Complex scene with multiple characters and detailed environment. Perfect for storytelling and book covers.', this.src)">
+          <div class="product-info">
+            <div class="product-title">Custom Illustration</div>
+            <div class="product-price">From $100</div>
+            <div class="product-description">Complex scene with details</div>
+            <span class="product-category">Illustration</span>
+          </div>
+        </div>
+
+        <!-- Commission Card 4 -->
+        <div class="product-card">
+          <img src="{{ asset('Chibi.jpg') }}" 
+               alt="Chibi Style" 
+               class="product-image" 
+               onclick="showModal('Chibi Commission', '$30', 'Cute chibi-style character perfect for stickers, emotes, and avatars. Quick turnaround time!', this.src)">
+          <div class="product-info">
+            <div class="product-title">Chibi Style</div>
+            <div class="product-price">From $30</div>
+            <div class="product-description">Cute simplified character</div>
+            <span class="product-category">Chibi</span>
+          </div>
+        </div>
       </div>
-  <a href="{{ path('app_commission_new') }}" class="btn-request" style="margin-top:1rem;">Request Commission</a>
-  </section>
-{% endblock %}
+    </div>
+
+    <!-- Portfolio Section -->
+    <div id="portfolio-section" style="display: none;">
+      <div class="portfolio-grid">
+        <!-- Portfolio Item 1 -->
+        <div class="portfolio-card">
+          <img src="{{ asset('FantasyK.jpg') }}" 
+               alt="Portfolio 1" 
+               class="portfolio-image" 
+               onclick="showModal('Fantasy Knight', '', 'Personal artwork exploring medieval fantasy themes', this.src)">
+          <div class="portfolio-info">
+            <div class="portfolio-title">Fantasy Knight</div>
+            <button class="btn-like" onclick="toggleLike(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Portfolio Item 2 -->
+        <div class="portfolio-card">
+          <img src="{{ asset('Cyberpunk.jpg') }}" 
+               alt="Portfolio 2" 
+               class="portfolio-image" 
+               onclick="showModal('Cyberpunk Portrait', '', 'Digital portrait with neon aesthetics', this.src)">
+          <div class="portfolio-info">
+            <div class="portfolio-title">Cyberpunk Portrait</div>
+            <button class="btn-like" onclick="toggleLike(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Portfolio Item 3 -->
+        <div class="portfolio-card">
+          <img src="{{ asset('NatureSpirit.jpg') }}" 
+               alt="Portfolio 3" 
+               class="portfolio-image" 
+               onclick="showModal('Nature Spirit', '', 'Character design inspired by forest mythology', this.src)">
+          <div class="portfolio-info">
+            <div class="portfolio-title">Nature Spirit</div>
+            <button class="btn-like" onclick="toggleLike(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Portfolio Item 4 -->
+        <div class="portfolio-card">
+          <img src="{{ asset('Furina.jpg') }}" 
+               alt="Portfolio 4" 
+               class="portfolio-image" 
+               onclick="showModal('Furina', '', 'Fiction character concept art', this.src)">
+          <div class="portfolio-info">
+            <div class="portfolio-title">Furina</div>
+            <button class="btn-like" onclick="toggleLike(this)">
+              <i class="bi bi-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="product-modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-body">
+        <img id="modal-image" src="" alt="Product" class="modal-image">
+        <div class="modal-info">
+          <h2 id="modal-title"></h2>
+          <div id="modal-price" class="price"></div>
+          <div id="modal-description" class="description"></div>
+          <button class="btn-request" style="margin: 0;">
+            <i class="bi bi-cart-plus me-2"></i>Order Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab Switching
+    const commissionsBtn = document.getElementById('show-commissions');
+    const portfolioBtn = document.getElementById('show-portfolio');
+    const commissionsSection = document.getElementById('commissions-section');
+    const portfolioSection = document.getElementById('portfolio-section');
+
+    commissionsBtn.onclick = function() {
+      commissionsSection.style.display = 'block';
+      portfolioSection.style.display = 'none';
+      commissionsBtn.classList.add('active');
+      portfolioBtn.classList.remove('active');
+    };
+
+    portfolioBtn.onclick = function() {
+      commissionsSection.style.display = 'none';
+      portfolioSection.style.display = 'block';
+      portfolioBtn.classList.add('active');
+      commissionsBtn.classList.remove('active');
+    };
+
+    // Modal Functions
+    function showModal(title, price, description, imageSrc) {
+      const modal = document.getElementById('product-modal');
+      document.getElementById('modal-image').src = imageSrc;
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-price').textContent = price;
+      document.getElementById('modal-description').textContent = description;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(event) {
+      if (!event || event.target.id === 'product-modal') {
+        const modal = document.getElementById('product-modal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Like Toggle
+    function toggleLike(btn) {
+      btn.classList.toggle('liked');
+      const icon = btn.querySelector('i');
+      icon.className = btn.classList.contains('liked') ? 'bi bi-heart-fill' : 'bi bi-heart';
+    }
+  </script>
+</body>
+</html>

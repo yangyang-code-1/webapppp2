@@ -100,12 +100,20 @@
   }
 </style>
 
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
   <div class="form-group">
     {{ form_label(form.name, 'Category Name', {'label_attr': {'class': 'form-label'}}) }}
     <span class="required-asterisk">*</span>
     {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'e.g., Character Design'}}) }}
     {{ form_errors(form.name) }}
+  </div>
+
+  <div class="form-group">
+    {{ form_label(form.slug, 'URL Slug', {'label_attr': {'class': 'form-label'}}) }}
+    <span class="required-asterisk">*</span>
+    {{ form_widget(form.slug, {'attr': {'class': 'form-control', 'placeholder': 'character-design', 'id': 'category-slug'}}) }}
+    {{ form_errors(form.slug) }}
+    <div class="form-help">URL-friendly version of the name (auto-generated from name)</div>
   </div>
 
   <div class="form-group">
@@ -122,18 +130,41 @@
     <div class="form-help">Use Bootstrap Icons (e.g., bi-palette-fill, bi-brush, bi-pen). See <a href="https://icons.getbootstrap.com/" target="_blank">icons.getbootstrap.com</a></div>
   </div>
 
+  <div class="form-group">
+    {{ form_label(form.position, 'Position', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.position, {'attr': {'class': 'form-control', 'placeholder': '1', 'type': 'number', 'min': '1'}}) }}
+    {{ form_errors(form.position) }}
+    <div class="form-help">Display order (optional, leave empty for auto-assignment)</div>
+  </div>
+
   <div class="form-check">
     {{ form_widget(form.isActive, {'attr': {'class': 'form-check-input'}}) }}
     {{ form_label(form.isActive, 'Active Category', {'label_attr': {'class': 'form-check-label'}}) }}
     {{ form_errors(form.isActive) }}
   </div>
 
-  {# Hide the unnecessary fields #}
-  <div style="display: none;">
-    {{ form_rest(form) }}
-  </div>
-
   <button type="submit" class="btn-submit">
-    <i class="bi bi-check-circle"></i> Create Category
+    <i class="bi bi-check-circle"></i> {{ button_label|default('Create Category') }}
   </button>
 {{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const nameField = document.querySelector('input[name="category[name]"]');
+  const slugField = document.getElementById('category-slug');
+  
+  if (nameField && slugField) {
+    nameField.addEventListener('input', function() {
+      const name = this.value;
+      const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+      
+      slugField.value = slug;
+    });
+  }
+});
+</script>
